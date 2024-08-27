@@ -1,14 +1,14 @@
 #!/bin/bash
-  echo -e "\e[32m\e[0m"
-  echo -e "\e[32m\e[0m"
-  echo -e "\e[32m  _____ _   _ _______ ______ _____  _      _____ _____   _____          \e[0m"
-  echo -e "\e[32m |_   _| \ | |__   __|  ____|  __ \| |    |_   _/ ____| |_   _|   /\    \e[0m"
-  echo -e "\e[32m   | | |  \| |  | |  | |__  | |__) | |      | || |  __    | |    /  \   \e[0m"
-  echo -e "\e[32m   | | |     |  | |  |  __| |  _  /| |      | || | |_ |   | |   / /\ \  \e[0m"
-  echo -e "\e[32m  _| |_| |\  |  | |  | |____| | \ \| |____ _| || |__| |  _| |_ / ____ \ \e[0m"
-  echo -e "\e[32m |_____|_| \_|  |_|  |______|_|  \_\______|_____\_____| |_____/_/    \_\ \e[0m"
-  echo -e "\e[32m\e[0m"
-  echo -e "\e[32m\e[0m"
+echo -e "\e[32m\e[0m"
+echo -e "\e[32m\e[0m"
+echo -e "\e[32m  _____ _   _ _______ ______ _____  _      _____ _____   _____          \e[0m"
+echo -e "\e[32m |_   _| \ | |__   __|  ____|  __ \| |    |_   _/ ____| |_   _|   /\    \e[0m"
+echo -e "\e[32m   | | |  \| |  | |  | |__  | |__) | |      | || |  __    | |    /  \   \e[0m"
+echo -e "\e[32m   | | |     |  | |  |  __| |  _  /| |      | || | |_ |   | |   / /\ \  \e[0m"
+echo -e "\e[32m  _| |_| |\  |  | |  | |____| | \ \| |____ _| || |__| |  _| |_ / ____ \ \e[0m"
+echo -e "\e[32m |_____|_| \_|  |_|  |______|_|  \_\______|_____\_____| |_____/_/    \_\ \e[0m"
+echo -e "\e[32m\e[0m"
+echo -e "\e[32m\e[0m"
 
 # Função para mostrar um banner colorido
 function show_banner() {
@@ -53,10 +53,20 @@ if [ "$confirma1" == "y" ]; then
   #########################################################
   # INSTALANDO DEPENDENCIAS
   #########################################################
-  sudo apt update -y && sudo apt upgrade -y
-  sudo apt install -y curl
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  sudo sh get-docker.sh
+  sudo apt-get update && sudo apt-get upgrade -y
+  sudo apt install -y sudo gnupg2 wget ca-certificates apt-transport-https curl gnupg nano htop
+  sudo install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  sudo chmod a+r /etc/apt/keyrings/docker.gpg
+  echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" |
+    sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+  sudo apt-get update
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  sudo systemctl enable docker.service
+  sudo systemctl enable containerd.service
+
   sudo docker swarm init --advertise-addr=$manager_ip
   mkdir -p ~/Portainer && cd ~/Portainer
   echo -e "\e[32mAtualizado/Instalado com Sucesso\e[0m"
@@ -180,17 +190,13 @@ EOL
   sudo docker stack deploy -c traefik-stack.yml traefik
   sudo docker stack deploy -c portainer-stack.yml portainer
   
-  echo -e "\e[32m\e[0m"
-  echo -e "\e[32m\e[0m"
-  echo -e "\e[32m  _____ _   _ _______ ______ _____  _      _____ _____   _____          \e[0m"
-  echo -e "\e[32m |_   _| \ | |__   __|  ____|  __ \| |    |_   _/ ____| |_   _|   /\    \e[0m"
-  echo -e "\e[32m   | | |  \| |  | |  | |__  | |__) | |      | || |  __    | |    /  \   \e[0m"
-  echo -e "\e[32m   | | |     |  | |  |  __| |  _  /| |      | || | |_ |   | |   / /\ \  \e[0m"
-  echo -e "\e[32m  _| |_| |\  |  | |  | |____| | \ \| |____ _| || |__| |  _| |_ / ____ \ \e[0m"
-  echo -e "\e[32m |_____|_| \_|  |_|  |______|_|  \_\______|_____\_____| |_____/_/    \_\ \e[0m"
-  echo -e "\e[32m\e[0m"
-  echo -e "\e[32m\e[0m"
-else
-  echo "Encerrando a instalação, por favor, inicie a instalação novamente."
-  exit 0
-fi
+echo -e "\e[32m\e[0m"
+echo -e "\e[32m\e[0m"
+echo -e "\e[32m  _____ _   _ _______ ______ _____  _      _____ _____   _____          \e[0m"
+echo -e "\e[32m |_   _| \ | |__   __|  ____|  __ \| |    |_   _/ ____| |_   _|   /\    \e[0m"
+echo -e "\e[32m   | | |  \| |  | |  | |__  | |__) | |      | || |  __    | |    /  \   \e[0m"
+echo -e "\e[32m   | | |     |  | |  |  __| |  _  /| |      | || | |_ |   | |   / /\ \  \e[0m"
+echo -e "\e[32m  _| |_| |\  |  | |  | |____| | \ \| |____ _| || |__| |  _| |_ / ____ \ \e[0m"
+echo -e "\e[32m |_____|_| \_|  |_|  |______|_|  \_\______|_____\_____| |_____/_/    \_\ \e[0m"
+echo -e "\e[32m\e[0m"
+echo -e "\e[32m\e[0m"
