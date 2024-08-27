@@ -200,3 +200,7 @@ echo -e "\e[32m  _| |_| |\  |  | |  | |____| | \ \| |____ _| || |__| |  _| |_ / 
 echo -e "\e[32m |_____|_| \_|  |_|  |______|_|  \_\______|_____\_____| |_____/_/    \_\ \e[0m"
 echo -e "\e[32m\e[0m"
 echo -e "\e[32m\e[0m"
+else
+  echo "Encerrando a instalação, por favor, inicie a instalação novamente."
+  exit 0
+fi
