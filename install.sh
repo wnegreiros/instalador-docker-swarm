@@ -18,7 +18,7 @@ echo -e "\e[32m=================================================================
 }
 # Função para mostrar uma mensagem de etapa
 function show_step() {
-  echo -e "\e[32mPasso \e[33m$1/7\e[0m"
+  echo -e "\e[32mPasso \e[33m$1/6\e[0m"
 }
 # Mostrar banner inicial
 clear
@@ -39,9 +39,6 @@ show_step 4
 read -p "🌐 Dominio do Portainer (ex: portainer.seudominio.com): " portainer
 echo ""
 show_step 5
-read -p "🌐 Dominio do Edge (ex: edge.seudominio.com): " edge
-echo ""
-show_step 6
 read -p "🖥️ IP do Manager (ex: 192.168.0.100): " manager_ip
 echo ""
 # Verificação de dados
@@ -51,7 +48,6 @@ echo "📧 Seu E-mail: $email"
 echo "🌐 Dominio do Traefik: $traefik"
 echo "🔑 Senha do Traefik: ********"
 echo "🌐 Dominio do Portainer: $portainer"
-echo "🌐 Dominio do Edge: $edge"
 echo "🖥️ IP do Manager: $manager_ip"
 echo ""
 read -p "As informações estão certas? (y/n): " confirma1
@@ -74,9 +70,9 @@ if [ "$confirma1" == "y" ]; then
   sudo docker network create --driver=overlay interlig_network
   sudo docker network create --driver=overlay interlig_traefik
   #########################################################
-  # CRIANDO DOCKER-COMPOSE.YML
+  # CRIANDO STACK DO TRAEFIK
   #########################################################
-  cat > docker-compose.yml <<EOL
+  cat > traefik-stack.yml <<EOL
 version: '3.8'
 
 services:
@@ -118,6 +114,20 @@ services:
       restart_policy:
         condition: on-failure
 
+volumes:
+  traefik_acme:
+
+networks:
+  interlig_traefik:
+    external: true
+EOL
+  #########################################################
+  # CRIANDO STACK DO PORTAINER
+  #########################################################
+  cat > portainer-stack.yml <<EOL
+version: '3.8'
+
+services:
   portainer:
     image: portainer/portainer-ce:latest
     command: -H unix:///var/run/docker.sock
@@ -137,16 +147,10 @@ services:
         - "traefik.http.services.frontend.loadbalancer.server.port=9000"
         - "traefik.http.routers.frontend.service=frontend"
         - "traefik.http.routers.frontend.tls.certresolver=lets"
-        - "traefik.http.routers.edge.rule=Host(\`$edge\`)"
-        - "traefik.http.routers.edge.entrypoints=websecure"
-        - "traefik.http.services.edge.loadbalancer.server.port=8000"
-        - "traefik.http.routers.edge.service=edge"
-        - "traefik.http.routers.edge.tls.certresolver=lets"
       restart_policy:
         condition: on-failure
 
 volumes:
-  traefik_acme:
   portainer_data:
 
 networks:
@@ -162,19 +166,20 @@ EOL
   touch acme.json
   sudo chmod 600 acme.json
   #########################################################
-  # INICIANDO STACK
+  # INICIANDO STACKS
   #########################################################
-  sudo docker stack deploy -c docker-compose.yml my_stack
-echo -e "\e[32m\e[0m"
-echo -e "\e[32m\e[0m"
-echo -e "\e[32m  _____ _   _ _______ ______ _____  _      _____ _____   _____          \e[0m"
-echo -e "\e[32m |_   _| \ | |__   __|  ____|  __ \| |    |_   _/ ____| |_   _|   /\    \e[0m"
-echo -e "\e[32m   | | |  \| |  | |  | |__  | |__) | |      | || |  __    | |    /  \   \e[0m"
-echo -e "\e[32m   | | |     |  | |  |  __| |  _  /| |      | || | |_ |   | |   / /\ \  \e[0m"
-echo -e "\e[32m  _| |_| |\  |  | |  | |____| | \ \| |____ _| || |__| |  _| |_ / ____ \ \e[0m"
-echo -e "\e[32m |_____|_| \_|  |_|  |______|_|  \_\______|_____\_____| |_____/_/    \_\ \e[0m"
-echo -e "\e[32m\e[0m"
-echo -e "\e[32m\e[0m"
+  sudo docker stack deploy -c traefik-stack.yml traefik_stack
+  sudo docker stack deploy -c portainer-stack.yml portainer_stack
+  echo -e "\e[32m\e[0m"
+  echo -e "\e[32m\e[0m"
+  echo -e "\e[32m  _____ _   _ _______ ______ _____  _      _____ _____   _____          \e[0m"
+  echo -e "\e[32m |_   _| \ | |__   __|  ____|  __ \| |    |_   _/ ____| |_   _|   /\    \e[0m"
+  echo -e "\e[32m   | | |  \| |  | |  | |__  | |__) | |      | || |  __    | |    /  \   \e[0m"
+  echo -e "\e[32m   | | |     |  | |  |  __| |  _  /| |      | || | |_ |   | |   / /\ \  \e[0m"
+  echo -e "\e[32m  _| |_| |\  |  | |  | |____| | \ \| |____ _| || |__| |  _| |_ / ____ \ \e[0m"
+  echo -e "\e[32m |_____|_| \_|  |_|  |______|_|  \_\______|_____\_____| |_____/_/    \_\ \e[0m"
+  echo -e "\e[32m\e[0m"
+  echo -e "\e[32m\e[0m"
 else
   echo "Encerrando a instalação, por favor, inicie a instalação novamente."
   exit 0
