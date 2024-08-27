@@ -68,7 +68,6 @@ if [ "$confirma1" == "y" ]; then
   mkdir -p ~/Portainer && cd ~/Portainer
   echo -e "\e[32mAtualizado/Instalado com Sucesso\e[0m"
   sleep 3
-  clear
   #########################################################
   # CRIANDO REDES DOCKER SWARM
   #########################################################
