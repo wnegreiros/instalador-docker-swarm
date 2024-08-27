@@ -77,6 +77,7 @@ if [ "$confirma1" == "y" ]; then
   #########################################################
   sudo docker network create --driver=overlay traefik_public
   sudo docker network create --driver=overlay agent_network
+  sudo docker network create --driver=overlay app_network
 
   #########################################################
   # CRIANDO STACK TRAEFIK
