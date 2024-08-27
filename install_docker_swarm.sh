@@ -21,7 +21,7 @@ function show_banner() {
 
 # Função para mostrar uma mensagem de etapa
 function show_step() {
-  echo -e "\e[32mPasso \e[33m$1/7\e[0m"
+  echo -e "\e[32mPasso \e[33m$1/3\e[0m"
 }
 
 # Mostrar banner inicial
